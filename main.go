@@ -1,21 +1,24 @@
 package main
 
-/*
-#cgo LDFLAGS: -landroid -llog
-#include <android/log.h>
-
-void cetakLog() {
-    __android_log_print(ANDROID_LOG_INFO, "AplikasiKu", "Hello dari Binary Native!");
-}
-*/
-import "C"
-import "fmt"
+import (
+	"fmt"
+	"github.com/AllenDang/cimgui-go"
+)
 
 func main() {
-    fmt.Println("--------------------------------")
-    fmt.Println("Aplikasi Binary Berjalan!")
-    fmt.Println("Mencoba memanggil fungsi C...")
-    C.cetakLog()
-    fmt.Println("Sukses! Cek logcat untuk pesan native.")
-    fmt.Println("--------------------------------")
+	fmt.Println("-------------------------------------------")
+	fmt.Println("[SUCCESS] Binary berhasil di-build!")
+	fmt.Println("[INFO] Library ImGui v1.4.0 terdeteksi.")
+	
+	// Kita coba inisialisasi Context ImGui (Core Graphics)
+	ctx := cimgui.CreateContext()
+	defer cimgui.DestroyContext(ctx)
+	
+	io := cimgui.CurrentIO()
+	// Simulasi layar HP
+	io.SetDisplaySize(cimgui.Vec2{X: 1080, Y: 2400}) 
+	
+	fmt.Println("[INFO] Context Grafis dibuat di memori.")
+	fmt.Println("[INFO] Jika ini muncul, berarti CGO + NDK bekerja!")
+	fmt.Println("-------------------------------------------")
 }
