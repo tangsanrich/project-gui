@@ -1,4 +1,4 @@
-name: Build InkyBlackness Binary
+name: Build InkyBlackness
 
 on:
   push:
@@ -15,7 +15,7 @@ jobs:
     - name: Set up Go
       uses: actions/setup-go@v4
       with:
-        go-version: '1.20' # Versi stabil untuk library tahun 2022
+        go-version: '1.20'
 
     - name: Setup Android NDK
       uses: nttld/setup-ndk@v1
@@ -23,32 +23,38 @@ jobs:
         ndk-version: r25b
         add-to-path: true
 
-    - name: Build Binary
+    - name: Build Binary (Fix CGO)
       run: |
-        # 1. Setup Compiler Android
-        export CC=$ANDROID_NDK_HOME/toolchains/llvm/prebuilt/linux-x86_64/bin/aarch64-linux-android30-clang
-        export CXX=$ANDROID_NDK_HOME/toolchains/llvm/prebuilt/linux-x86_64/bin/aarch64-linux-android30-clang++
+        # 1. DEFINISI COMPILER (Sangat Penting!)
+        # Kita set variabel ini agar Go tahu di mana letak compiler C dan C++ Android
+        export ANDROID_CC=$ANDROID_NDK_HOME/toolchains/llvm/prebuilt/linux-x86_64/bin/aarch64-linux-android30-clang
+        export ANDROID_CXX=$ANDROID_NDK_HOME/toolchains/llvm/prebuilt/linux-x86_64/bin/aarch64-linux-android30-clang++
         
-        # 2. Environment Wajib
+        # 2. PAKSA CGO MENYALA
+        # Kita masukkan compiler tadi ke variabel CC dan CXX milik Go
+        export CC=$ANDROID_CC
+        export CXX=$ANDROID_CXX
         export CGO_ENABLED=1
         export GOOS=android
         export GOARCH=arm64
         
-        # 3. Flags Kompatibilitas
-        # InkyBlackness v4 cukup stabil, biasanya hanya butuh -fsigned-char di Android
+        # 3. SETTINGAN FLAGS (Agar C++ InkyBlackness tidak error)
         export CGO_CFLAGS="-fsigned-char"
-        export CGO_CXXFLAGS="-fsigned-char"
-        
-        # 4. Linker
-        # Kita hanya minta library sistem dasar Android
+        export CGO_CXXFLAGS="-fsigned-char -std=c++17"
         export CGO_LDFLAGS="-landroid -llog"
         
-        # 5. Download Dependency
+        # Debug: Cek apakah Go benar-benar melihat CGO aktif
+        echo "Cek Environment Go:"
+        go env CGO_ENABLED
+        go env CC
+        go env CXX
+        
+        # 4. DOWNLOAD & BUILD
         go mod tidy
         
-        # 6. Build Command
-        # Kita build main.go kita menjadi binary bernama 'tes-inky'
-        go build -v -ldflags "-s -w" -o tes-inky
+        # Perintah Build
+        # Kita gunakan flag -x untuk melihat log detail jika error lagi
+        go build -v -x -ldflags "-s -w" -o tes-inky
 
     - name: Upload Artifact
       uses: actions/upload-artifact@v4
