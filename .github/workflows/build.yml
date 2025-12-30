@@ -25,24 +25,24 @@ jobs:
 
     - name: Build Binary
       run: |
-        # Setup Compiler
+        # 1. Setup Compiler (Jembatan ke Android)
         export CC=$ANDROID_NDK_HOME/toolchains/llvm/prebuilt/linux-x86_64/bin/aarch64-linux-android30-clang
         export CXX=$ANDROID_NDK_HOME/toolchains/llvm/prebuilt/linux-x86_64/bin/aarch64-linux-android30-clang++
         
-        # Settingan Go
+        # 2. Aktifkan CGO
         export CGO_ENABLED=1
         export GOOS=android
         export GOARCH=arm64
         
-        # --- PERBAIKAN UTAMA ADA DI SINI ---
-        # Memaksa char menjadi signed agar cocok dengan Go wrapper
+        # 3. FIX COMPILER (Masalah char/int8 yang tadi)
         export CGO_CFLAGS="-fsigned-char"
-        # -----------------------------------
         
-        # Download library
+        # 4. FIX LINKER (Masalah baru Anda: C++ Library)
+        # Kita wajib menyertakan -lstdc++ (Library C++) dan -lm (Matematika)
+        export CGO_LDFLAGS="-static-libstdc++ -lm -latomic -llog -landroid"
+        
+        # 5. Download & Build
         go mod tidy
-        
-        # Build
         go build -v -ldflags "-s -w" -o aplikasiku
 
     - name: Upload Artifact
