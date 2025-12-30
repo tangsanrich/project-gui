@@ -8,10 +8,9 @@ import (
 func main() {
 	fmt.Println("[+] Memulai Aplikasi...")
 
-	// Buat context
-	ctx := imgui.CreateContext()
+	// PERBAIKAN: Gunakan '_' atau panggil langsung agar tidak dianggap unused variable
+	_ = imgui.CreateContext()
 	
-	// PERBAIKAN DI SINI: Hapus 'ctx' dari dalam kurung
 	defer imgui.DestroyContext()
 	
 	io := imgui.CurrentIO()
