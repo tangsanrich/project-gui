@@ -1,2 +1,6 @@
-github.com/AllenDang/cimgui-go v1.4.1-0.20251219090331-b086c171a949 h1:Z2U1OgU2ftqiuqXrXelmJ1KI3rUkIBP9sHVd8A3pFxE=
-github.com/AllenDang/cimgui-go v1.4.1-0.20251219090331-b086c171a949/go.mod h1:f1037T1lGjq01xIhaVlU10lUuAokm9DlJQpMNi7gG3M=
+github.com/davecgh/go-spew v1.1.0/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
+github.com/inkyblackness/imgui-go/v4 v4.7.0 h1:Gc169uXvSydsr/gjw3p1cmHCI1XIpqX7I3KBmfeMMOo=
+github.com/inkyblackness/imgui-go/v4 v4.7.0/go.mod h1:g8SAGtOYUP7rYaOB2AsVKCEHmPMDmJKgt4z6d+flhb0=
+github.com/pmezard/go-difflib v1.0.0/go.mod h1:iKH77koFhYxTK1pcRnkKkqfTogsbg7gZNVY4sRDYZ/4=
+github.com/stretchr/objx v0.1.0/go.mod h1:HFkY916IF+rwdDfMAkV7OtwuqBVzrE8GR6GFx+wExME=
+github.com/stretchr/testify v1.3.0/go.mod h1:M5WIy9Dh21IEIfnGCwXGc5bZfKNJtfHm1UVUgZn+9EI=

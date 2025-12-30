@@ -1,5 +1,5 @@
-module aplikasiku
+module belajar-inky
 
 go 1.25.4
 
-require github.com/AllenDang/cimgui-go v1.4.1-0.20251219090331-b086c171a949
+require github.com/inkyblackness/imgui-go/v4 v4.7.0
