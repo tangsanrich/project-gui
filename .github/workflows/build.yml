@@ -1,4 +1,4 @@
-name: Build Android Binary
+name: Build InkyBlackness Binary
 
 on:
   push:
@@ -15,7 +15,7 @@ jobs:
     - name: Set up Go
       uses: actions/setup-go@v4
       with:
-        go-version: '1.22'
+        go-version: '1.20' # Versi stabil untuk library tahun 2022
 
     - name: Setup Android NDK
       uses: nttld/setup-ndk@v1
@@ -25,7 +25,7 @@ jobs:
 
     - name: Build Binary
       run: |
-        # 1. Setup Compiler
+        # 1. Setup Compiler Android
         export CC=$ANDROID_NDK_HOME/toolchains/llvm/prebuilt/linux-x86_64/bin/aarch64-linux-android30-clang
         export CXX=$ANDROID_NDK_HOME/toolchains/llvm/prebuilt/linux-x86_64/bin/aarch64-linux-android30-clang++
         
@@ -34,23 +34,25 @@ jobs:
         export GOOS=android
         export GOARCH=arm64
         
-        # 3. FIX WAJIB: Paksa char menjadi signed (agar Go tidak error int8)
-        # Kita HAPUS CGO_LDFLAGS dari sini agar tidak menimpa settingan library
+        # 3. Flags Kompatibilitas
+        # InkyBlackness v4 cukup stabil, biasanya hanya butuh -fsigned-char di Android
         export CGO_CFLAGS="-fsigned-char"
-        export CGO_CXXFLAGS="-fsigned-char -std=c++17 -w"
+        export CGO_CXXFLAGS="-fsigned-char"
         
-        # 4. Download Library Terbaru
-        go get github.com/AllenDang/cimgui-go@main
+        # 4. Linker
+        # Kita hanya minta library sistem dasar Android
+        export CGO_LDFLAGS="-landroid -llog"
+        
+        # 5. Download Dependency
         go mod tidy
         
-        # 5. BUILD COMMAND (THE REAL FIX)
-        # -tags "static" : Paksa compile source C++
-        # -extldflags : Tambahkan library android tanpa menghapus library internal ImGui
-        go build -tags "static" -v -ldflags "-s -w -extldflags '-landroid -llog'" -o aplikasiku
+        # 6. Build Command
+        # Kita build main.go kita menjadi binary bernama 'tes-inky'
+        go build -v -ldflags "-s -w" -o tes-inky
 
     - name: Upload Artifact
       uses: actions/upload-artifact@v4
       with:
-        name: hasil-build-android
-        path: aplikasiku
+        name: hasil-build-inky
+        path: tes-inky
 
