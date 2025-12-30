@@ -29,22 +29,24 @@ jobs:
         export CC=$ANDROID_NDK_HOME/toolchains/llvm/prebuilt/linux-x86_64/bin/aarch64-linux-android30-clang
         export CXX=$ANDROID_NDK_HOME/toolchains/llvm/prebuilt/linux-x86_64/bin/aarch64-linux-android30-clang++
         
-        # 2. Environment Go
+        # 2. Environment Dasar
         export CGO_ENABLED=1
         export GOOS=android
         export GOARCH=arm64
         
-        # 3. Bendera Perdamaian (Agar char/int8 akur)
+        # 3. FIX CRITICAL: Paksa char signed (masalah int8) & Standar C++
         export CGO_CFLAGS="-fsigned-char"
+        export CGO_CXXFLAGS="-fsigned-char -std=c++11"
         
-        # 4. Linker Simpel (Biarkan NDK yang mengatur C++, kita cukup minta log & android)
+        # 4. LINKER SIMPLE: Biarkan NDK mengatur C++, kita cukup minta log & android
+        # Menghapus '-static-libstdc++' yang tadi bikin error undefined symbol
         export CGO_LDFLAGS="-landroid -llog"
         
         # 5. Download Library
         go mod tidy
         
-        # 6. BUILD DENGAN TAGS (RAHASIANYA DI SINI)
-        # -tags "static" memaksa library untuk meng-compile source code C++ ImGui
+        # 6. BUILD COMMAND (THE FIX)
+        # Menambahkan -tags "static" adalah kunci agar kode C++ ImGui ikut dikompilasi
         go build -tags "static" -v -ldflags "-s -w" -o aplikasiku
 
     - name: Upload Artifact
