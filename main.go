@@ -2,23 +2,22 @@ package main
 
 import (
 	"fmt"
-	"github.com/AllenDang/cimgui-go"
+	
+	// SEKARANG INI PASTI BISA (Karena induknya sudah ada):
+	"github.com/AllenDang/cimgui-go/imgui"
 )
 
 func main() {
-	fmt.Println("-------------------------------------------")
-	fmt.Println("[SUCCESS] Binary berhasil di-build!")
-	fmt.Println("[INFO] Library ImGui v1.4.0 terdeteksi.")
+	fmt.Println("[+] Memulai Aplikasi...")
+
+	// Perhatikan: Kita panggil pakai 'imgui.' bukan 'cimgui.'
+	ctx := imgui.CreateContext()
+	defer imgui.DestroyContext(ctx)
 	
-	// Kita coba inisialisasi Context ImGui (Core Graphics)
-	ctx := cimgui.CreateContext()
-	defer cimgui.DestroyContext(ctx)
+	io := imgui.CurrentIO()
+	io.SetDisplaySize(imgui.Vec2{X: 1080, Y: 2400}) 
 	
-	io := cimgui.CurrentIO()
-	// Simulasi layar HP
-	io.SetDisplaySize(cimgui.Vec2{X: 1080, Y: 2400}) 
-	
-	fmt.Println("[INFO] Context Grafis dibuat di memori.")
-	fmt.Println("[INFO] Jika ini muncul, berarti CGO + NDK bekerja!")
-	fmt.Println("-------------------------------------------")
+	fmt.Println("[SUCCESS] Context ImGui berhasil dibuat!")
+	fmt.Println("[INFO] Build sukses menggunakan package imgui.")
 }
+
