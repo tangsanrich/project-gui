@@ -1,4 +1,4 @@
-name: Build InkyBlackness Ultimate
+name: Build TUI Mod Menu
 
 on:
   push:
@@ -17,51 +17,25 @@ jobs:
       with:
         go-version: '1.21'
 
-    - name: Setup Android NDK
-      uses: nttld/setup-ndk@v1
-      with:
-        ndk-version: r25b
-        add-to-path: true
-
-    - name: Build Binary (Direct Injection)
+    - name: Build ELF Binary
       run: |
-        echo "=== [1] MENCARI LOKASI COMPILER ==="
-        # Kita cari compiler secara otomatis (karena ini sudah terbukti berhasil di log Anda)
-        CC_PATH=$(find $ANDROID_NDK_HOME -name "aarch64-linux-android*-clang" | grep "bin/aarch64" | head -n 1)
-        CXX_PATH=$(find $ANDROID_NDK_HOME -name "aarch64-linux-android*-clang++" | grep "bin/aarch64" | head -n 1)
+        # Setup Environment untuk Cross-Compile ke Android ARM64
+        # KITA MATIKAN CGO (CGO_ENABLED=0) agar jadi binary murni yang portabel
+        export CGO_ENABLED=0
+        export GOOS=android
+        export GOARCH=arm64
         
-        if [ -z "$CC_PATH" ]; then
-          echo "FATAL: Compiler tidak ditemukan!"
-          exit 1
-        fi
-        
-        echo "Compiler: $CC_PATH"
-        
-        echo "=== [2] DOWNLOAD MODULE ==="
+        # Download dependencies
         go mod tidy
         
-        echo "=== [3] BUILD DENGAN DIRECT INJECTION ==="
-        # INI KUNCINYA!
-        # Kita taruh semua variabel tepat sebelum perintah 'go build'
-        # Teknik ini memaksa variable tersebut aktif HANYA untuk perintah ini
-        # dan tidak mungkin diabaikan.
-        
-        CGO_ENABLED=1 \
-        CC="$CC_PATH" \
-        CXX="$CXX_PATH" \
-        GOOS=android \
-        GOARCH=arm64 \
-        CGO_CFLAGS="-fsigned-char" \
-        CGO_CXXFLAGS="-fsigned-char -std=c++17 -w" \
-        go build \
-          -x \
-          -v \
-          -ldflags "-s -w -extldflags '-landroid -llog'" \
-          -o inky-app
+        # Build Command
+        # -s -w untuk memperkecil ukuran file
+        # Output file bernama 'modmenu'
+        go build -ldflags "-s -w" -o modmenu
 
     - name: Upload Artifact
       uses: actions/upload-artifact@v4
       with:
-        name: hasil-build-inky
-        path: inky-app
+        name: binary-modmenu-termux
+        path: modmenu
 
