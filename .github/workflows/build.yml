@@ -15,7 +15,7 @@ jobs:
     - name: Set up Go
       uses: actions/setup-go@v4
       with:
-        go-version: '1.23'
+        go-version: '1.22' # Kita naikkan versi Go biar lebih aman
 
     - name: Setup Android NDK
       uses: nttld/setup-ndk@v1
@@ -34,20 +34,22 @@ jobs:
         export GOOS=android
         export GOARCH=arm64
         
-        # 3. FIX CRITICAL: Paksa char signed (masalah int8) & Standar C++
+        # 3. FIX Flags (Penting!)
+        # -fsigned-char: Agar char Android sama dengan Go
+        # -std=c++17: Agar fitur modern C++ ImGui jalan
         export CGO_CFLAGS="-fsigned-char"
-        export CGO_CXXFLAGS="-fsigned-char -std=c++11"
+        export CGO_CXXFLAGS="-fsigned-char -std=c++17 -w" 
         
-        # 4. LINKER SIMPLE: Biarkan NDK mengatur C++, kita cukup minta log & android
-        # Menghapus '-static-libstdc++' yang tadi bikin error undefined symbol
+        # 4. Linker Sederhana
         export CGO_LDFLAGS="-landroid -llog"
         
-        # 5. Download Library
+        # 5. Download Library (Pastikan versi @main terambil)
+        go get github.com/AllenDang/cimgui-go@main
         go mod tidy
         
-        # 6. BUILD COMMAND (THE FIX)
-        # Menambahkan -tags "static" adalah kunci agar kode C++ ImGui ikut dikompilasi
-        go build -tags "static" -v -ldflags "-s -w" -o aplikasiku
+        # 6. Build Command
+        # Kita hapus tags "static" karena versi main biasanya sudah auto-detect
+        go build -v -ldflags "-s -w" -o aplikasiku
 
     - name: Upload Artifact
       uses: actions/upload-artifact@v4
